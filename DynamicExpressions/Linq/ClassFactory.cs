@@ -19,9 +19,7 @@ namespace DynamicExpressions.Linq
 
         private ClassFactory()
         {
-            AssemblyName name = new AssemblyName("DynamicClasses");
-            AssemblyBuilder assembly = AssemblyBuilder.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
-            module = assembly.DefineDynamicModule("Module");
+            module = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName("DynamicClasses"), AssemblyBuilderAccess.Run).DefineDynamicModule("Module");
             classes = new Dictionary<Signature, Type>();
             rwLock = new ReaderWriterLock();
         }
