@@ -163,8 +163,15 @@ namespace DynamicExpressions.Linq
             void Average(decimal selector);
             void Average(decimal? selector);
             void OrderBy(object selector);
+            void OrderByDescending(object selector);
             void Select(object selector);
             void FirstOrDefault();
+        }
+
+        interface IOrderedEnumerableSignatures : IEnumerableSignatures
+        {
+            void ThenBy(object selector);
+            void ThenByDescending(object selector);
         }
 
         static readonly Expression trueLiteral = Expression.Constant(true);
@@ -906,10 +913,11 @@ namespace DynamicExpressions.Linq
             it = innerIt;
             Expression[] args = ParseArgumentList();
             it = outerIt;
-            if (FindMethod(typeof(IEnumerableSignatures), methodName, false, args, out MethodBase signature) != 1)
+            var searchType = (instance.Type.IsGenericType && instance.Type.GetGenericTypeDefinition() == typeof(IOrderedEnumerable<>)) ? typeof(IOrderedEnumerableSignatures) : typeof(IEnumerableSignatures);
+            if (FindMethod(searchType, methodName, false, args, out MethodBase signature) != 1)
                 throw ParseError(errorPos, Res.NoApplicableAggregate, methodName);
             Type[] typeArgs;
-            if (signature.Name == "Min" || signature.Name == "Max" || signature.Name == "OrderBy" || signature.Name == "Select")
+            if (Predefined.GenericMethods.Contains(signature.Name))
             {
                 typeArgs = new Type[] { elementType, args[0].Type };
             }
