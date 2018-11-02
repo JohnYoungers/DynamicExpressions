@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <VersionPrefix>0.9.0</VersionPrefix>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>John Youngers</Authors>
+    <Company>Youngers Consulting</Company>
+    <Description>.Net library that includes Dynamic Linq and other Expression oriented functionality</Description>
+    <PackageLicenseUrl>https://github.com/jayoungers/DynamicExpressions/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/jayoungers/DynamicExpressions/wiki</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jayoungers/DynamicExpressions</RepositoryUrl>
+    <PackageTags>youngers consulting dynamiclinq dynamic linq expressions generated types</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>
