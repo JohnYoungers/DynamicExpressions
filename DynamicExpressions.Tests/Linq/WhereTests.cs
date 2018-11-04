@@ -47,5 +47,13 @@ namespace DynamicExpressions.Tests.Linq
             Assert.AreEqual(1, match.Count);
             Assert.AreEqual(letter, match[0].Letter);
         }
+
+        [TestMethod]
+        public void ReferencesItself()
+        {
+            var items = new[] { 'A', 'B', 'C', 'D' };
+
+            Assert.AreEqual('B', items.Where("it == 'B'").FirstOrDefault());
+        }
     }
 }

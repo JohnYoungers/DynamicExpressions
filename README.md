@@ -4,3 +4,5 @@
 
 # DynamicExpressions
 .Net library that includes Dynamic Linq and other Expression oriented functionality
+
+For more details, visit the [DynamicExpressions Wiki](https://github.com/jayoungers/DynamicExpressions/wiki).
