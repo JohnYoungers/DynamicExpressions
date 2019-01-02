@@ -40,6 +40,7 @@ namespace DynamicExpressions.Linq
             Equal,
             GreaterThan,
             Question,
+            Coalesce,
             OpenBracket,
             CloseBracket,
             Bar,
@@ -163,8 +164,15 @@ namespace DynamicExpressions.Linq
             void Average(decimal selector);
             void Average(decimal? selector);
             void OrderBy(object selector);
+            void OrderByDescending(object selector);
             void Select(object selector);
             void FirstOrDefault();
+        }
+
+        interface IOrderedEnumerableSignatures : IEnumerableSignatures
+        {
+            void ThenBy(object selector);
+            void ThenByDescending(object selector);
         }
 
         static readonly Expression trueLiteral = Expression.Constant(true);
@@ -277,7 +285,13 @@ namespace DynamicExpressions.Linq
         {
             int errorPos = token.pos;
             Expression expr = ParseLogicalOr();
-            if (token.id == TokenId.Question)
+            if (token.id == TokenId.Coalesce)
+            {
+                NextToken();
+                Expression expr1 = ParseExpression();
+                expr = Expression.Coalesce(expr, expr1);
+            }
+            else if(token.id == TokenId.Question)
             {
                 NextToken();
                 Expression expr1 = ParseExpression();
@@ -906,10 +920,11 @@ namespace DynamicExpressions.Linq
             it = innerIt;
             Expression[] args = ParseArgumentList();
             it = outerIt;
-            if (FindMethod(typeof(IEnumerableSignatures), methodName, false, args, out MethodBase signature) != 1)
+            var searchType = (instance.Type.IsGenericType && instance.Type.GetGenericTypeDefinition() == typeof(IOrderedEnumerable<>)) ? typeof(IOrderedEnumerableSignatures) : typeof(IEnumerableSignatures);
+            if (FindMethod(searchType, methodName, false, args, out MethodBase signature) != 1)
                 throw ParseError(errorPos, Res.NoApplicableAggregate, methodName);
             Type[] typeArgs;
-            if (signature.Name == "Min" || signature.Name == "Max" || signature.Name == "OrderBy" || signature.Name == "Select")
+            if (Predefined.GenericMethods.Contains(signature.Name))
             {
                 typeArgs = new Type[] { elementType, args[0].Type };
             }
@@ -1692,7 +1707,15 @@ namespace DynamicExpressions.Linq
                     break;
                 case '?':
                     NextChar();
-                    t = TokenId.Question;
+                    if (ch == '?')
+                    {
+                        NextChar();
+                        t = TokenId.Coalesce;
+                    }
+                    else
+                    {
+                        t = TokenId.Question;
+                    }
                     break;
                 case '[':
                     NextChar();

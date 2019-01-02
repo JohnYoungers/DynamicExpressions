@@ -19,9 +19,9 @@ namespace DynamicExpressions.Tests.Linq.Models
                     SubProperty = new ChildEntity { IsOdd = (i % 2 == 1) },
                     ComplexProperty = new List<ComplexChildEntity>()
                     {
-                        new ComplexChildEntity { Index = ((10 - i) * 10) + 1 },
-                        new ComplexChildEntity { Index = ((10 - i) * 10) + 2 },
-                        new ComplexChildEntity { Index = ((10 - i) * 10) + 3 },
+                        new ComplexChildEntity { Index = ((10 - i) * 10) + 1, Level = 1, Value = "Z" },
+                        new ComplexChildEntity { Index = ((10 - i) * 10) + 2, Level = 1, Value = "Y" },
+                        new ComplexChildEntity { Index = ((10 - i) * 10) + 3, Level = 1, Value = "X" }
                     }
                 });
             }
@@ -31,6 +31,7 @@ namespace DynamicExpressions.Tests.Linq.Models
 
         public int Counter { get; set; }
         public char Letter { get; set; }
+        public char? NullableLetter { get; set; }
         public ChildEntity SubProperty { get; set; }
         public List<ComplexChildEntity> ComplexProperty { get; set; }
     }

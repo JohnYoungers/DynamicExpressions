@@ -34,5 +34,16 @@ namespace DynamicExpressions.Linq
             typeof(Math),
             typeof(Convert)
         };
+
+        public static List<string> GenericMethods { get; private set; } = new List<string>
+        {
+            "Min",
+            "Max",
+            "Select",
+            "OrderBy",
+            "OrderByDescending",
+            "ThenBy",
+            "ThenByDescending"
+        };
     }
 }

@@ -7,5 +7,7 @@ namespace DynamicExpressions.Tests.Linq.Models
     public class ComplexChildEntity
     {
         public int Index { get; set; }
+        public int Level { get; set; }
+        public string Value { get; set; }
     }
 }
