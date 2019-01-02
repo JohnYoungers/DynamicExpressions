@@ -28,6 +28,16 @@ namespace DynamicExpressions.Tests.Linq
         }
 
         [TestMethod]
+        public void Coalesce()
+        {
+            mockData[1].NullableLetter = 'Z';
+            var results = mockData.Select("NullableLetter ?? Letter").Cast<char>().ToList();
+
+            Assert.AreEqual('A', results[0]);
+            Assert.AreEqual('Z', results[1]);
+        }
+
+        [TestMethod]
         public void Any()
         {
             var results = mockData.Select("ComplexProperty.Any(Index == 91)").Cast<bool>().ToList();

@@ -40,6 +40,7 @@ namespace DynamicExpressions.Linq
             Equal,
             GreaterThan,
             Question,
+            Coalesce,
             OpenBracket,
             CloseBracket,
             Bar,
@@ -284,7 +285,13 @@ namespace DynamicExpressions.Linq
         {
             int errorPos = token.pos;
             Expression expr = ParseLogicalOr();
-            if (token.id == TokenId.Question)
+            if (token.id == TokenId.Coalesce)
+            {
+                NextToken();
+                Expression expr1 = ParseExpression();
+                expr = Expression.Coalesce(expr, expr1);
+            }
+            else if(token.id == TokenId.Question)
             {
                 NextToken();
                 Expression expr1 = ParseExpression();
@@ -1700,7 +1707,15 @@ namespace DynamicExpressions.Linq
                     break;
                 case '?':
                     NextChar();
-                    t = TokenId.Question;
+                    if (ch == '?')
+                    {
+                        NextChar();
+                        t = TokenId.Coalesce;
+                    }
+                    else
+                    {
+                        t = TokenId.Question;
+                    }
                     break;
                 case '[':
                     NextChar();

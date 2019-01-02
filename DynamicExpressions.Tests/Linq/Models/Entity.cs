@@ -31,6 +31,7 @@ namespace DynamicExpressions.Tests.Linq.Models
 
         public int Counter { get; set; }
         public char Letter { get; set; }
+        public char? NullableLetter { get; set; }
         public ChildEntity SubProperty { get; set; }
         public List<ComplexChildEntity> ComplexProperty { get; set; }
     }
