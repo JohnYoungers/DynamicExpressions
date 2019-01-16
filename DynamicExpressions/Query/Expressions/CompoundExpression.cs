@@ -8,7 +8,7 @@ namespace DynamicExpressions.Query.Expressions
     public class CompoundExpression : QueryExpression
     {
         public CompoundOperation Operation { get; set; }
-        public List<QueryExpression> Expressions { get; } = new List<QueryExpression>();
+        public List<QueryExpression> Expressions { get; set; }
 
         public override string ToString()
         {

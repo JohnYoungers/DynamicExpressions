@@ -6,9 +6,9 @@ namespace DynamicExpressions.Query
 {
     public class ParseException : Exception
     {
-        public int Position { get; }
+        public int? Position { get; }
 
-        public ParseException(string message, int position) : base(message)
+        public ParseException(string message, int? position = null) : base(message)
         {
             Position = position;
         }

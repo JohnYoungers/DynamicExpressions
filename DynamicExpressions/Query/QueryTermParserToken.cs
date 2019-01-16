@@ -6,12 +6,16 @@ namespace DynamicExpressions.Query
 {
     public enum QueryTermParserToken
     {
-        None,
+        Literal,
         Expression,
         Quote,
         Between,
         And,
         Or,
-        Equals
+        Equals,
+        LessThan,
+        LessThanEquals,
+        GreaterThan,
+        GreaterThanEquals
     }
 }

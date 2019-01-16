@@ -82,12 +82,12 @@ namespace DynamicExpressions.Tests.Query
             Assert.AreEqual("d Equals 4", level0CompoundExpression.Expressions[1].ToString());
 
             var level1CompoundExpression = level0CompoundExpression.Expressions[0] as CompoundExpression;
-            Assert.AreEqual(CompoundOperation.And, level0CompoundExpression.Operation);
+            Assert.AreEqual(CompoundOperation.And, level1CompoundExpression.Operation);
             Assert.AreEqual(2, level1CompoundExpression.Expressions.Count);
             Assert.AreEqual("c Equals 3", level1CompoundExpression.Expressions[0].ToString());
 
             var level2CompoundExpression = level1CompoundExpression.Expressions[1] as CompoundExpression;
-            Assert.AreEqual(CompoundOperation.Or, level0CompoundExpression.Operation);
+            Assert.AreEqual(CompoundOperation.Or, level2CompoundExpression.Operation);
             Assert.AreEqual(2, level2CompoundExpression.Expressions.Count);
 
             var level2Exp1 = level2CompoundExpression.Expressions[0] as ComparisonExpression;
@@ -102,5 +102,4 @@ namespace DynamicExpressions.Tests.Query
             Assert.AreEqual("2", level2Exp2.Value);
         }
     }
-
 }

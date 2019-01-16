@@ -6,6 +6,11 @@ using System.Text;
 
 namespace DynamicExpressions.Mapping
 {
+    /// <summary>
+    /// Untested until Query pieces are complete
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
+    /// <typeparam name="TTarget"></typeparam>
     public class ExpressionMapQueryGenerator<TSource, TTarget>
     {
         public Expression<Func<TSource, TTarget>> Map { get; set; }
