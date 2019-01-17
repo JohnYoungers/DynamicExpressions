@@ -38,7 +38,7 @@ namespace DynamicExpressions.Query
                     {
                         for (var i = 0; i < find.Length; i++)
                         {
-                            if (i > lowerQuery.Length || lowerQuery[index + i] != find[i])
+                            if (index + i >= lowerQuery.Length || lowerQuery[index + i] != find[i])
                             {
                                 return false;
                             }

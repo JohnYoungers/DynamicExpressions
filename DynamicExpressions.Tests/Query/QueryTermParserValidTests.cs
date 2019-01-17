@@ -13,9 +13,13 @@ namespace DynamicExpressions.Tests.Query
         [TestMethod]
         public void TermExpression()
         {
-            var result = QueryTermParser.Parse("a b c");
-            Assert.AreEqual("a b c", result.Term);
+            // This one will trigger a peek()
+            var result = QueryTermParser.Parse("B");
+            Assert.AreEqual("B", result.Term);
+            Assert.AreEqual("B", (result.Expression as TermExpression).Value);
 
+            // Verifying spaces don't cause a term break
+            result = QueryTermParser.Parse("a b c");
             Assert.AreEqual("a b c", (result.Expression as TermExpression).Value);
         }
 
