@@ -34,6 +34,27 @@ namespace DynamicExpressions.Tests.Mapping
             }
         }
 
+        public class FlattenExample
+        {
+            public FooSummaryViewModel Summary { get; set; }
+            public FooViewModel Full { get; set; }
+
+            public static Expression<Func<FooEntity, FlattenExample>> Map()
+            {
+                var fooSummaryMap = FooSummaryViewModel.Map();
+                var fooMap = FooViewModel.Map();
+
+                Expression<Func<FooEntity, FlattenExample>> map = i => new FlattenExample
+                {
+                    Summary = fooSummaryMap.Invoke(i),
+                    Full = fooMap.Invoke(i)
+                };
+
+                var x = map.Flatten();
+                return x;
+            }
+        }
+
         [TestMethod]
         public void Concat()
         {
@@ -41,6 +62,15 @@ namespace DynamicExpressions.Tests.Mapping
 
             Assert.AreEqual("A", result.Prop1);
             Assert.AreEqual("B", result.Addr);
+        }
+
+        [TestMethod]
+        public void Flatten()
+        {
+            var result = FlattenExample.Map().Compile().Invoke(new FooEntity { FieldA = "A", Address1 = "B" });
+
+            Assert.AreEqual("A", result.Full.Prop1);
+            Assert.AreEqual("A", result.Summary.Prop1);
         }
     }
 

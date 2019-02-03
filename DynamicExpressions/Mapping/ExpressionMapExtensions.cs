@@ -28,5 +28,15 @@ namespace DynamicExpressions.Mapping
                     })),
                 param);
         }
+
+        public static TTarget Invoke<TSource, TTarget>(this Expression<Func<TSource, TTarget>> map, TSource arg)
+        {
+            return map.Compile().Invoke(arg);
+        }
+
+        public static Expression<Func<TSource, TTarget>> Flatten<TSource, TTarget>(this Expression<Func<TSource, TTarget>> map)
+        {
+            return (Expression<Func<TSource, TTarget>>)new ExpressionExpansionVisitor().Visit(map);
+        }
     }
 }
