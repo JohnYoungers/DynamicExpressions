@@ -4,57 +4,13 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using DynamicExpressions.Mapping;
+using DynamicExpressions.Tests.Mapping.Models;
 
 namespace DynamicExpressions.Tests.Mapping
 {
     [TestClass]
     public class ExpressionMapExtensionsTests
     {
-        public class FooEntity
-        {
-            public string FieldA { get; set; }
-            public string Address1 { get; set; }
-        }
-        public class FooSummaryViewModel
-        {
-            public string Prop1 { get; set; }
-
-            public static Expression<Func<FooEntity, FooSummaryViewModel>> Map()
-            {
-                return i => new FooSummaryViewModel { Prop1 = i.FieldA };
-            }
-        }
-        public class FooViewModel : FooSummaryViewModel
-        {
-            public string Addr { get; set; }
-
-            public new static Expression<Func<FooEntity, FooViewModel>> Map()
-            {
-                return FooSummaryViewModel.Map().Concat(i => new FooViewModel { Addr = i.Address1 });
-            }
-        }
-
-        public class FlattenExample
-        {
-            public FooSummaryViewModel Summary { get; set; }
-            public FooViewModel Full { get; set; }
-
-            public static Expression<Func<FooEntity, FlattenExample>> Map()
-            {
-                var fooSummaryMap = FooSummaryViewModel.Map();
-                var fooMap = FooViewModel.Map();
-
-                Expression<Func<FooEntity, FlattenExample>> map = i => new FlattenExample
-                {
-                    Summary = fooSummaryMap.Invoke(i),
-                    Full = fooMap.Invoke(i)
-                };
-
-                var x = map.Flatten();
-                return x;
-            }
-        }
-
         [TestMethod]
         public void Concat()
         {
@@ -65,12 +21,25 @@ namespace DynamicExpressions.Tests.Mapping
         }
 
         [TestMethod]
+        public void Flatten_InvalidInvoke()
+        {
+            var ex = Assert.ThrowsException<InvalidOperationException>(() => FooViewModel.Map().Invoke(new FooEntity { FieldA = "A", Address1 = "B" }));
+            Assert.AreEqual("This method is intended to be used in conjunction with Flatten", ex.Message);
+        }
+
+        [TestMethod]
         public void Flatten()
         {
-            var result = FlattenExample.Map().Compile().Invoke(new FooEntity { FieldA = "A", Address1 = "B" });
+            var map = FlattenExample.Map();
+            var result = map.Compile().Invoke(new FooEntity { FieldA = "A", Address1 = "B" });
 
-            Assert.AreEqual("A", result.Full.Prop1);
+            // Verify map worked
             Assert.AreEqual("A", result.Summary.Prop1);
+            Assert.AreEqual("B", result.Full.Addr);
+
+            // Verify map was flattened
+            Assert.AreEqual("i => new FlattenExample() {Summary = new FooSummaryViewModel() {Prop1 = i.FieldA}, Full = new FooViewModel() {Prop1 = i.FieldA, Addr = i.Address1}}",
+                            map.ToString());
         }
     }
 
