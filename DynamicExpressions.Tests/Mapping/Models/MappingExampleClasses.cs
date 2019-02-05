@@ -15,18 +15,21 @@ namespace DynamicExpressions.Tests.Mapping.Models
     {
         public string Prop1 { get; set; }
 
-        public static Expression<Func<FooEntity, FooSummaryViewModel>> Map()
+        // Using as field
+        public static Expression<Func<FooEntity, FooSummaryViewModel>> Map = i => new FooSummaryViewModel
         {
-            return i => new FooSummaryViewModel { Prop1 = i.FieldA };
-        }
+            Prop1 = i.FieldA
+        };
     }
+
     public class FooViewModel : FooSummaryViewModel
     {
         public string Addr { get; set; }
 
+        // Concat + using as property
         public new static Expression<Func<FooEntity, FooViewModel>> Map()
         {
-            return FooSummaryViewModel.Map().Concat(i => new FooViewModel { Addr = i.Address1 });
+            return FooSummaryViewModel.Map.Concat(i => new FooViewModel { Addr = i.Address1 });
         }
     }
 
@@ -37,12 +40,11 @@ namespace DynamicExpressions.Tests.Mapping.Models
 
         public static Expression<Func<FooEntity, FlattenExample>> Map()
         {
-            var fooSummaryMap = FooSummaryViewModel.Map();
             var fooMap = FooViewModel.Map();
 
             Expression<Func<FooEntity, FlattenExample>> map = i => new FlattenExample
             {
-                Summary = fooSummaryMap.Invoke(i),
+                Summary = FooSummaryViewModel.Map.Invoke(i),
                 Full = fooMap.Invoke(i)
             };
 

@@ -26,12 +26,18 @@ namespace DynamicExpressions.Mapping
         {
             if (node.Method.DeclaringType == typeof(ExpressionMapExtensions)
                 && node.Method.Name == "Invoke"
-                && node.Arguments[0] is MemberExpression me
-                && me.Expression is ConstantExpression ce)
+                && node.Arguments[0] is MemberExpression me)
             {
-                var result = ((FieldInfo)me.Member).GetValue(ce.Value);
-
-                var lambda = Visit(result as Expression) as LambdaExpression;
+                LambdaExpression lambda = null;
+                if (me.Expression is ConstantExpression ce)
+                {
+                    var result = ((FieldInfo)me.Member).GetValue(ce.Value);
+                    lambda = Visit(result as Expression) as LambdaExpression;
+                }
+                else
+                {
+                    lambda = Visit(Expression.Lambda<Func<Expression>>(me).Compile()()) as LambdaExpression;
+                }
 
                 var fe = new Dictionary<ParameterExpression, Expression>(FlattenedExpressions);
                 for (int i = 0; i < lambda.Parameters.Count; i++)
