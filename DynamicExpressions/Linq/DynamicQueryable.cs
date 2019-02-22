@@ -44,6 +44,26 @@ namespace DynamicExpressions.Linq
                     source.Expression, Expression.Quote(lambda)));
         }
 
+        public static IQueryable SelectMany(this IQueryable source, string selector, params object[] values)
+        {
+            if (source == null) throw new ArgumentNullException("source");
+            if (selector == null) throw new ArgumentNullException("selector");
+            LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, null, selector, values);
+
+            Type inputType = source.Expression.Type.GetGenericArguments()[0];
+            Type resultType = lambda.Body.Type.GetGenericArguments()[0];
+            Type enumerableType = typeof(IEnumerable<>).MakeGenericType(resultType);
+            Type delegateType = typeof(Func<,>).MakeGenericType(inputType, enumerableType);
+            lambda = Expression.Lambda(delegateType, lambda.Body, lambda.Parameters);
+
+            return source.Provider.CreateQuery(
+                Expression.Call(
+                    typeof(Queryable), "SelectMany",
+                    new Type[] { source.ElementType, resultType },
+                    source.Expression,
+                    Expression.Quote(lambda)));
+        }
+
         public static IQueryable<T> OrderBy<T>(this IQueryable<T> source, string ordering, params object[] values)
         {
             return (IQueryable<T>)OrderBy((IQueryable)source, ordering, values);
@@ -53,21 +73,20 @@ namespace DynamicExpressions.Linq
         {
             if (source == null) throw new ArgumentNullException("source");
             if (ordering == null) throw new ArgumentNullException("ordering");
-            ParameterExpression[] parameters = new ParameterExpression[] {
-                Expression.Parameter(source.ElementType, "") };
+            ParameterExpression[] parameters = new ParameterExpression[] { Expression.Parameter(source.ElementType, "") };
             ExpressionParser parser = new ExpressionParser(parameters, ordering, values);
             IEnumerable<DynamicOrdering> orderings = parser.ParseOrdering();
             Expression queryExpr = source.Expression;
-            string methodAsc = "OrderBy";
-            string methodDesc = "OrderByDescending";
+            string methodAsc = nameof(Queryable.OrderBy);
+            string methodDesc = nameof(Queryable.OrderByDescending);
             foreach (DynamicOrdering o in orderings)
             {
                 queryExpr = Expression.Call(
                     typeof(Queryable), o.Ascending ? methodAsc : methodDesc,
                     new Type[] { source.ElementType, o.Selector.Type },
                     queryExpr, Expression.Quote(Expression.Lambda(o.Selector, parameters)));
-                methodAsc = "ThenBy";
-                methodDesc = "ThenByDescending";
+                methodAsc = nameof(Queryable.ThenBy);
+                methodDesc = nameof(Queryable.ThenByDescending);
             }
             return source.Provider.CreateQuery(queryExpr);
         }
@@ -203,6 +222,12 @@ namespace DynamicExpressions.Linq
         {
             if (source == null) throw new ArgumentNullException("source");
             return source.AsQueryable().Select(selector, values);
+        }
+
+        public static IEnumerable SelectMany(this IEnumerable source, string selector, params object[] values)
+        {
+            if (source == null) throw new ArgumentNullException("source");
+            return source.AsQueryable().SelectMany(selector, values);
         }
 
         public static IEnumerable<T> OrderBy<T>(this IEnumerable<T> source, string ordering, params object[] values)

@@ -166,6 +166,7 @@ namespace DynamicExpressions.Linq
             void OrderBy(object selector);
             void OrderByDescending(object selector);
             void Select(object selector);
+            void SelectMany(object selector);
             void FirstOrDefault();
         }
 
@@ -928,16 +929,23 @@ namespace DynamicExpressions.Linq
             {
                 typeArgs = new Type[] { elementType, args[0].Type };
             }
+            else if (methodName == nameof(Enumerable.SelectMany))
+            {
+                var type = Expression.Lambda(args[0], innerIt).Body.Type;
+                var interfaces = type.GetInterfaces().Union(new[] { type });
+                Type interfaceType = interfaces.Single(i => i.Name == typeof(IEnumerable<>).Name);
+                Type resultType = interfaceType.GetGenericArguments()[0];
+                typeArgs = new[] { elementType, resultType };
+            }
             else
             {
                 typeArgs = new Type[] { elementType };
             }
+
             if (args.Length == 0)
             {
                 args = new Expression[] { instance };
             }
-
-
             else
             {
                 if (signature.Name == "Contains")
