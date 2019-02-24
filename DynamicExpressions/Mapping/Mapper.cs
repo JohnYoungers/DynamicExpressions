@@ -37,7 +37,7 @@ namespace DynamicExpressions.Mapping
                                 ? listDef.ExpressionGenerator(sourceParam, entityParam)
                                 : Linq.DynamicExpression.Parse(new[] { entityParam }, null, listDef.Expression, null);
 
-                    var enumerableInterface = exp.Type.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+                    var enumerableInterface = (new[] { exp.Type }).Union(exp.Type.GetInterfaces()).FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>));
                     if (enumerableInterface == null)
                     {
                         throw new ArgumentException($"List {listDef.Name} must result in a type that implements IEnumerable<>");

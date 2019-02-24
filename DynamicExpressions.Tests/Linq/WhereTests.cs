@@ -55,5 +55,14 @@ namespace DynamicExpressions.Tests.Linq
 
             Assert.AreEqual('B', items.Where("it == 'B'").FirstOrDefault());
         }
+
+        [TestMethod]
+        public void SelectMany()
+        {
+            var results = mockData.Where("ComplexProperty.SelectMany(SubChildren).Any(it == 2)").ToList();
+
+            Assert.AreEqual(1, results.Count);
+            Assert.AreEqual('C', results[0].Letter);
+        }
     }
 }

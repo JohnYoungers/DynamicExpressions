@@ -8,6 +8,16 @@ namespace DynamicExpressions.Mapping
 {
     public static class ExpressionMapExtensions
     {
+        public static TTarget Invoke<TSource, TTarget>(this Expression<Func<TSource, TTarget>> map, TSource arg)
+        {
+            throw new InvalidOperationException($"This method is intended to be used in conjunction with {nameof(Flatten)}");
+        }
+
+        public static Expression<Func<TSource, TTarget>> Flatten<TSource, TTarget>(this Expression<Func<TSource, TTarget>> map)
+        {
+            return (Expression<Func<TSource, TTarget>>)new ExpressionExpansionVisitor().Visit(map);
+        }
+
         public static Expression<Func<TSource, TTargetB>> Concat<TSource, TTargetA, TTargetB>(
             this Expression<Func<TSource, TTargetA>> mapA, Expression<Func<TSource, TTargetB>> mapB)
             where TTargetB : TTargetA
